@@ -20,6 +20,9 @@ WORKDIR /app
 # Copia todos os arquivos do diretório atual para a pasta /app do container.
 COPY . .
 
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \ 
+    CMD [ "curl", "-f", "http://localhost:3001" ]
 # executa o arquivo index.js
 CMD ["node", "index.js"]
 
