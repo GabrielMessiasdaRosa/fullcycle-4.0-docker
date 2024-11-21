@@ -9,17 +9,24 @@ FROM node:${NODE_VERSION}
 ENV PORT=3001
 ENV MESSAGE="Hello Docker!"
 
-RUN useradd -m mynode
-USER mynode
-# USER 1001 = Para usar o usuário padrão do sistema operacional
+
 
 # Copia o arquivo package.json para a pasta /app do container. 
 # A pasta /app é criada automaticamente pelo Docker.
 WORKDIR /app
 
+# Copia o arquivo package.json para a pasta /app do container.
+COPY package*.json ./
+
+# Instala as dependências do projeto
+RUN npm install
+
 # Copia todos os arquivos do diretório atual para a pasta /app do container.
 COPY . .
 
+RUN useradd -m mynode
+USER mynode
+# USER 1001 = Para usar o usuário padrão do sistema operacional
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \ 
     CMD [ "curl", "-f", "http://localhost:3001" ]
