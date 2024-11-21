@@ -9,8 +9,6 @@ FROM node:${NODE_VERSION}
 ENV PORT=3001
 ENV MESSAGE="Hello Docker!"
 
-
-
 # Copia o arquivo package.json para a pasta /app do container. 
 # A pasta /app é criada automaticamente pelo Docker.
 WORKDIR /app
@@ -24,12 +22,21 @@ RUN npm install
 # Copia todos os arquivos do diretório atual para a pasta /app do container.
 COPY . .
 
+# Adiciona o usuário mynode ao container
 RUN useradd -m mynode
+
 USER mynode
 # USER 1001 = Para usar o usuário padrão do sistema operacional
 
+# HEALTHCHECK é uma instrução que permite que você verifique a saúde do seu aplicativo.
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \ 
     CMD [ "curl", "-f", "http://localhost:3001" ]
+
+# VOLUME é uma instrução que cria um ponto de montagem com o nome especificado e marca-o para armazenamento persistente.
+VOLUME /app/data
+
+# Expõe a porta 3001 do container
+EXPOSE ${PORT}
 # executa o arquivo index.js
 CMD ["node", "index.js"]
 
