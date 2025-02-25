@@ -1,0 +1,52 @@
+services:
+  app:
+    build: 
+      context: ./mynode-network
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      file: ./mynode-network/.env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - my-networks
+  app-watch:
+    build: 
+      context: ./mynode-network
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
+    environment:
+      file: ./mynode-network/.env
+    develop:
+      watch:
+        - path: ./mynode-network
+          target: /app
+          action: sync+restart
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - my-networks
+  db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
+    environment:
+     file: ./.db.env
+    volumes:
+      - ./mongo_data:/data/db
+    networks:
+      - my-networks
+
+networks:
+  my-networks:
+    driver: bridge
